@@ -1,0 +1,127 @@
+(1) Iterated Dominance Frontier Algorithm
+
+Input: A set of blocks S
+Output: The set of DF+(S)
+
+Worklist = {}
+DF+(S) = {}
+foreach B \belongsto S do
+    DF+(S) = DF+(S) \union {B}; // ???? (I am not sure, if we need this or not)
+    Worklist = Worklist \union {B};
+endfor;
+while Worklist != {} do
+    take B from Worklist;
+    foreach C \belongsto DF(B) do
+        if C \notbelongsto DF+(S) then
+            DF+(S) = DF+(S) \union {C};
+            Worklist = Worklist \union {C};
+        endif;
+    endfor;
+endwhile;
+
+(2) Algorithm for inserting phi-nodes
+
+Perform Live-Variable Analysis
+foreach T \belongsto Variables do
+    if T \belongsto Globals then
+        S = { B | B contains definition of T} \union {Entry};
+        Compute DF+(S);
+        foreach B \belongsto DF+(S) do
+            if B \belongsto LiveIn then
+                n = |pred(B)|;
+                Insert an n-operand T = phi(T, ..., T) in B;
+            endif;
+        endfor;
+    endif;
+endfor;
+
+(3) Basic SSA Renaming Algorithm
+
+Goal: Renaming temporaries (need to replace uses with new names), so walk the dominaotor tree and replace
+        uses dominated by a definition
+
+foreach T \belongsto Variables do
+    NameStack(T) = {};
+endfor;
+RENAME(Entry);
+procedure RENAME(B: Block)
+    foreach I := T0 = phi(T1, ..., Tn) \belongsto PHI(B) do
+        push NewName() on Top(NameStack(T0));
+    endfor;
+    foreach I \belongsto B in execution order do
+        foreach T \belongsto Operands(I) do
+            replace T by Top(NameStack(T));
+            add I to Uses(Top(NameStack(T)));
+        endfor;
+        T = Target(I)
+        push NewName() on Top(NameStack(T));
+    endfor;
+    foreach S \belongsto Succ(B) do
+        j = WhichPredecessor(S, B);
+        foreach I := T0 = phi(T1, ..., Tn) \belongsto PHI(S) do
+            replace Tj by (Top(NameStack(Tj)));
+            add I to Uses(NameStack(Tj));
+        endfor;
+    endfor;
+    foreach C \belongsto Children(B) do
+        call RENAME(C);
+    endfor;
+    foreach I \belongsto B in reverse execution order do
+        T = Target(I)
+        replace T by Pop(NameStack(T));
+    endfor;
+    foreach T0 = phi(T1, ..., Tn) \belongsto PHI(B) do
+        repalce T0 by Pop(NameStack(T0));
+    endfor;
+endprocedure RENAME;
+
+(4) Dominator Based Global Common Subexpression Elimination
+
+* A limited form of global CSE, used before dependence-based optimization and other SSA-based optimizations,
+    no code motions, redundancy found only along paths in dominator tree
+* In SSA all syntatically equivalent expression are semantically equivalent
+* Method:
+    - Keep a block structured table of available expression
+        -> StartBlock: add a scope in the expression table for this block
+        -> EndBlock: remove the scope for the curent block
+    - perform CSE on the dominator tree while constructing SSA
+
+OPTRENMAE(b){
+    foreach T0 = phi(T1, ..., Tn) \belongsto PHI(b){
+        push NewName() on NameStack(T0)
+    }
+    StartBlock(b)
+    foreach I \belongsto b in execution order {
+        foreach T \belongsto operand(I){
+            repalce T by Top(NameStack(T))
+        }
+        if I.expr() \belongsto AVAIL { // insert if \notbelongsto AVAIL
+            T = I.lval()
+            push GetTarget(Avail, i) on NameStack(T)
+            DEAD \union= {I}
+        } else {
+            push NewName() on Top(NameStack(I.lval()))
+        }
+    }
+    for each s \belongsto succ(b) {
+        j = WhichPredecessor(s, b)
+        foreach T0 = phi(T1, ..., Tn) \belongsto PHI(s){
+            replace Tj with Top(NameStack(Tj))
+        }
+    }
+    foreach c \belongsto Children(b){
+        OPTRENMAE(c)
+    }
+    foreach I \belongsto b in reverse order {
+        X = Pop(NameStack(I.lval()))
+        if I \belongsto DEAD{
+            remove I
+        } else {
+            replace I.lval() with X
+        }
+    }
+    foreach T0 = phi(T1, ..., Tn) \belongsto PHI(b){
+        replace T0 by Pop(NameStack(T0))
+    }
+    EndBlock(b)
+}
