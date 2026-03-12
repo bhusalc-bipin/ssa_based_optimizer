@@ -11,11 +11,8 @@
 class SSA_Based_Optimizer {
 private:
     std::unordered_map<int, DominanceInfo> dominance_info_;
-    std::unordered_map<int, std::vector<int>> dom_tree_;
+    std::unordered_map<int, std::vector<int>> dominance_tree_;
     SSA_Constructor ssa_constructor_;
-
-    // Build the dominator tree from dominance info
-    void build_dominator_tree(const CFG& cfg);
 
     // Mark unreachable blocks as deleted
     // NOTE: This is not a SSA based optimization and can be performed anytime after or during CFG
