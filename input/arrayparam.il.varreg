@@ -1,0 +1,12 @@
+Routine: main
+	Variable Registers: %vr4 %vr11 
+
+Routine: init
+	Variable Registers: %vr4 %vr5 
+
+Routine: writearray
+	Variable Registers: 
+
+Routine: inc
+	Variable Registers: 
+

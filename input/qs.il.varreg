@@ -1,0 +1,15 @@
+Routine: main
+	Variable Registers: %vr8 
+
+Routine: readarray
+	Variable Registers: %vr4 
+
+Routine: writearray
+	Variable Registers: %vr4 
+
+Routine: partition
+	Variable Registers: %vr7 %vr8 %vr9 %vr10 
+
+Routine: quicksort
+	Variable Registers: 
+
