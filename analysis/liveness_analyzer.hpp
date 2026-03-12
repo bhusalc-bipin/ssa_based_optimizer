@@ -17,12 +17,15 @@ class Liveness_Analyzer {
 private:
     // map from block id to upward exposed variables
     std::unordered_map<int, std::unordered_set<std::string>> ue_vars;
+
     // map from block id to variables killed in the block
     std::unordered_map<int, std::unordered_set<std::string>> var_kill;
 
+    // compute live-out for each block
     void compute_local_information(const CFG& cfg, const std::vector<BasicBlock>& blocks,
         const std::vector<Instruction>& instructions);
 
+    // propagate liveness info across blocks until convergence
     void solve_dataflow_equations(const CFG& cfg);
 
 public:
