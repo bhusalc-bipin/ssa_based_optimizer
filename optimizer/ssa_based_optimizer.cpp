@@ -55,7 +55,8 @@ void SSA_Based_Optimizer::optimize(
     dominance_tree_ = dominance_analyzer.dominance_tree;
 
     // Construct SSA form
-    ssa_constructor_.construct_ssa_form(cfg, blocks, instructions, dominance_info_);
+    ssa_constructor_.construct_ssa_form(
+        cfg, blocks, instructions, dominance_info_, dominance_tree_);
 
     // Optimize
     eliminate_unreachable_blocks(cfg, blocks, instructions);

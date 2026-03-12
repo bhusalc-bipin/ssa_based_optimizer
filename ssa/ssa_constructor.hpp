@@ -1,7 +1,6 @@
 #pragma once
 
 #include "analysis/dominance_analyzer.hpp"
-#include "analysis/liveness_analyzer.hpp"
 #include "cfg/basic_block.hpp"
 #include "cfg/cfg_generator.hpp"
 
@@ -29,7 +28,7 @@ private:
     // rename stack for base_name, where top = current SSA name in scope
     std::unordered_map<std::string, std::stack<std::string>> name_stacks_;
 
-    // scoped AVAIL table, where each entry is one block's scope (push on StartBlock, pop on
+    // scoped AVAIL table, where each entry is a block's scope (push on StartBlock, pop on
     // EndBlock), and key = expression key, value = SSA name that first computed it
     std::vector<std::unordered_map<std::string, std::string>> avail_;
 
@@ -52,7 +51,7 @@ private:
     // Build and return expression key for instruction after sources are renamed
     // Return empty string for instructions not eligible (instruction wit side-effect or the ones
     // that don't have target or branch instruction) for AVAIL
-    std::string make_expr_key(const Instruction& instr);
+    std::string generate_expression_key(const Instruction& instr);
 
     // compute the iterated dominance frontier
     std::unordered_set<int> compute_idf(const std::unordered_set<int>& S,
