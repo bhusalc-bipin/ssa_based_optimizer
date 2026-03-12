@@ -23,12 +23,6 @@ private:
     void eliminate_unreachable_blocks(const CFG& cfg, const std::vector<BasicBlock>& blocks,
         std::vector<Instruction>& instructions);
 
-    // Dominator based redundancy elimination
-    // NOTE: This can be performed during rename phase of SSA construction, but I wanted to put all
-    // optimization code in one place so putting it here.
-    void perform_dbre(const CFG& cfg, const std::vector<BasicBlock>& blocks,
-        std::vector<Instruction>& instructions);
-
     // Dead code elimination (mark-sweep algorithm)
     void eliminate_useless_code(const CFG& cfg, const std::vector<BasicBlock>& blocks,
         std::vector<Instruction>& instructions);

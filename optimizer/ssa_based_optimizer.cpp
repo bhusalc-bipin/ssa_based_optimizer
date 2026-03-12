@@ -53,11 +53,6 @@ void SSA_Based_Optimizer::eliminate_unreachable_blocks(
     }
 }
 
-void SSA_Based_Optimizer::perform_dbre(
-    const CFG& cfg, const std::vector<BasicBlock>& blocks, std::vector<Instruction>& instructions) {
-    // TODO: implement
-}
-
 void SSA_Based_Optimizer::eliminate_useless_code(
     const CFG& cfg, const std::vector<BasicBlock>& blocks, std::vector<Instruction>& instructions) {
     // TODO: implement
@@ -77,7 +72,5 @@ void SSA_Based_Optimizer::optimize(
 
     // Optimize
     eliminate_unreachable_blocks(cfg, blocks, instructions);
-    // DBRE is used before dependence-based optimization and other SSA-based optimizations
-    perform_dbre(cfg, blocks, instructions);
     eliminate_useless_code(cfg, blocks, instructions);
 }
