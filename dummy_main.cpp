@@ -1,5 +1,6 @@
 // dummy_main.cpp
 #include "analysis/dominance_analyzer.hpp"
+#include "analysis/liveness_analyzer.hpp"
 #include "cfg/basic_block_generator.hpp"
 #include "cfg/cfg_generator.hpp"
 
@@ -143,6 +144,26 @@ int main(int argc, char* argv[]) {
                     std::cout << child << " ";
                 std::cout << "}\n";
             }
+        }
+
+        // Compute and print liveness info
+        Liveness_Analyzer la;
+        la.perform_liveness_analysis(cfg, bbg.blocks_, bbg.instructions_);
+
+        std::cout << "\nLiveIn:\n";
+        for (int bid : cfg.block_ids) {
+            std::cout << "  LiveIn(" << bid << ") = { ";
+            for (const auto& var : la.liveness_info[bid].live_in)
+                std::cout << var << " ";
+            std::cout << "}\n";
+        }
+
+        std::cout << "\nLiveOut:\n";
+        for (int bid : cfg.block_ids) {
+            std::cout << "  LiveOut(" << bid << ") = { ";
+            for (const auto& var : la.liveness_info[bid].live_out)
+                std::cout << var << " ";
+            std::cout << "}\n";
         }
     }
     return 0;

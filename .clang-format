@@ -1,0 +1,12 @@
+BasedOnStyle: WebKit
+IndentWidth: 4
+TabWidth: 4
+UseTab: Never
+ColumnLimit: 100
+
+# Braces on a new line for functions/classes
+BreakBeforeBraces: Attach
+
+# Do not keep short functions in a single line
+AllowShortFunctionsOnASingleLine: None
+AllowShortBlocksOnASingleLine: false

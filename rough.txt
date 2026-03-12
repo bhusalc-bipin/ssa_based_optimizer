@@ -1,3 +1,3 @@
-g++ -std=c++23 -I. -o dummy_optimizer dummy_main.cpp cfg/basic_block_generator.cpp cfg/cfg_generator.cpp analysis/dominance_analyzer.cpp
+g++ -std=c++23 -I. -o dummy_optimizer dummy_main.cpp cfg/basic_block_generator.cpp cfg/cfg_generator.cpp analysis/dominance_analyzer.cpp analysis/liveness_analyzer.cpp
 ./dummy_optimizer input/gcd.il
 rm dummy_optimizer

@@ -2,7 +2,6 @@
 
 #include <unordered_set>
 
-
 void Dominance_Analyzer::compute_dominators(const CFG& cfg) {
     const int entry_block = cfg.block_ids[0];
 
