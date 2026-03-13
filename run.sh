@@ -28,7 +28,7 @@ mkdir -p "$OUTPUT_DIR"
 
 ./ssa_optimizer "$INPUT_FILE"
 
-./iloc -s "$OUTPUT_FILE" > "$ACTUAL_OUTPUT"
+./iloc "$OUTPUT_FILE" > "$ACTUAL_OUTPUT"
 
 # Remove all blank lines
 sed -i '/^[[:space:]]*$/d' "$ACTUAL_OUTPUT"

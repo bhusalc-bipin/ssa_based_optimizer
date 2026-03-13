@@ -340,6 +340,12 @@ void SSA_Constructor::construct_ssa_form(const CFG& cfg, const std::vector<Basic
     const std::unordered_map<int, DominanceInfo>& dominance_info,
     const std::unordered_map<int, std::vector<int>>& dominance_tree) {
 
+    name_counter_.clear();
+    name_stacks_.clear();
+    avail_.clear();
+    dead_.clear();
+    phi_functions.clear();
+
     insert_phi_functions(cfg, blocks, instructions, dominance_info);
     optrename(cfg.block_ids[0], cfg, blocks, instructions, dominance_info, dominance_tree);
 }
