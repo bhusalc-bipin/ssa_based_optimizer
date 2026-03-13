@@ -1,6 +1,7 @@
 #include "cfg/basic_block_generator.hpp"
 #include "cfg/cfg_generator.hpp"
 #include "opcode_info.hpp"
+#include "optimizer/iloc_based_optimizer.hpp"
 #include "optimizer/ssa_based_optimizer.hpp"
 #include "ssa/ssa_deconstructor.hpp"
 
@@ -112,6 +113,10 @@ int main(int argc, char* argv[]) {
         ssa_based_optimizer.optimize(cfg, bbg.blocks_, bbg.instructions_);
         ssa_deconstructor.deconstruct_ssa(bbg.instructions_);
     }
+
+    // Step 4: Run iloc-based optimization for each procedure
+    ILOC_Based_Optimizer iloc_based_optimizer;
+    iloc_based_optimizer.optimize(bbg.blocks_, bbg.instructions_);
 
     // Step 5: Write the optimized iloc code
     write_iloc_file(bbg.instructions_, output_filepath);

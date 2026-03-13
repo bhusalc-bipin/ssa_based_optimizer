@@ -3,7 +3,7 @@
 CXX = g++
 CXXFLAGS = -std=c++23 -Wall -Wextra -I.
 TARGET = ssa_optimizer
-SRCS = main.cpp cfg/basic_block_generator.cpp cfg/cfg_generator.cpp analysis/dominance_analyzer.cpp analysis/liveness_analyzer.cpp ssa/ssa_constructor.cpp ssa/ssa_deconstructor.cpp optimizer/ssa_based_optimizer.cpp
+SRCS = main.cpp cfg/basic_block_generator.cpp cfg/cfg_generator.cpp analysis/dominance_analyzer.cpp analysis/liveness_analyzer.cpp ssa/ssa_constructor.cpp ssa/ssa_deconstructor.cpp optimizer/ssa_based_optimizer.cpp optimizer/iloc_based_optimizer.cpp
 OBJS = $(SRCS:.cpp=.o)
 
 $(TARGET): $(OBJS)
