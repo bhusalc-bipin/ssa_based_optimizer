@@ -2,10 +2,7 @@
 
 #include <unordered_set>
 
-// Helper function to compute the dominators for each block in the CFG
-static void compute_dominators(
-    const CFG& cfg, std::unordered_map<int, DominanceInfo>& dominance_info) {
-
+void Dominance_Analyzer::compute_dominators(const CFG& cfg) {
     const int entry_block = cfg.block_ids[0];
 
     // Initialization: the entry block is only dominated by itself, and all other blocks are
@@ -51,14 +48,10 @@ static void compute_dominators(
     }
 }
 
-/* Helper function to compute the immediate dominators for each block in the CFG
- *
- * Note: this function assumes that the dominators for each block have already been computed and
+/* Note: this function assumes that the dominators for each block have already been computed and
  * stored in the dominance_info map
  */
-static void compute_immediate_dominators(
-    const CFG& cfg, std::unordered_map<int, DominanceInfo>& dominance_info) {
-
+void Dominance_Analyzer::compute_immediate_dominators(const CFG& cfg) {
     const int entry_block = cfg.block_ids[0];
     dominance_info[entry_block].immediate_dominator = -1; // entry block has no immediate dominator
 
@@ -91,14 +84,10 @@ static void compute_immediate_dominators(
     }
 }
 
-/* Helper function to compute the dominance frontiers for each block in the CFG
- *
- * Note: this function assumes that the immediate dominators for each block have already been
+/* Note: this function assumes that the immediate dominators for each block have already been
  * computed and stored in the dominance_info map.
  */
-static void compute_dominance_frontiers(
-    const CFG& cfg, std::unordered_map<int, DominanceInfo>& dominance_info) {
-
+void Dominance_Analyzer::compute_dominance_frontiers(const CFG& cfg) {
     // for each block in CFG set DF(n) to empty
     for (const auto& current_block : cfg.block_ids) {
         dominance_info[current_block].dominance_frontier = {};
@@ -121,9 +110,22 @@ static void compute_dominance_frontiers(
     }
 }
 
+void Dominance_Analyzer::build_dominator_tree(const CFG& cfg) {
+    for (int block_id : cfg.block_ids) {
+        if (!dominance_info.contains(block_id)) {
+            continue;
+        }
+        int idom = dominance_info.at(block_id).immediate_dominator;
+        if (idom != -1) {
+            dominance_tree[idom].push_back(block_id);
+        }
+    }
+}
+
 void Dominance_Analyzer::perform_dominance_analysis(const CFG& cfg) {
-    // order of these three computations matters and the following is the correct order
-    compute_dominators(cfg, dominance_info);
-    compute_immediate_dominators(cfg, dominance_info);
-    compute_dominance_frontiers(cfg, dominance_info);
+    // order of these computations matters and the following is the correct order
+    compute_dominators(cfg);
+    compute_immediate_dominators(cfg);
+    compute_dominance_frontiers(cfg);
+    build_dominator_tree(cfg);
 }

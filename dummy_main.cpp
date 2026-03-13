@@ -1,8 +1,8 @@
 // dummy_main.cpp
 #include "analysis/dominance_analyzer.hpp"
+#include "analysis/liveness_analyzer.hpp"
 #include "cfg/basic_block_generator.hpp"
 #include "cfg/cfg_generator.hpp"
-#include "ssa/ssa_constructor.hpp"
 
 #include <iostream>
 
@@ -135,49 +135,36 @@ int main(int argc, char* argv[]) {
             std::cout << "}\n";
         }
 
-        // Construct SSA form
-        SSA_Constructor ssa;
-        ssa.construct_ssa_form(cfg, bbg.blocks_, bbg.instructions_, da.dominance_info);
-
-        // Print SSA form: phi functions and renamed instructions per block
-        std::cout << "\n=== SSA Form ===\n";
+        std::cout << "\nDominator Tree (parent -> children):\n";
         for (int bid : cfg.block_ids) {
-            std::cout << "\nBlock " << bid << ":\n";
-
-            // Print phi functions for this block
-            if (ssa.phi_functions.contains(bid)) {
-                for (const auto& phi : ssa.phi_functions[bid]) {
-                    std::cout << "  " << phi.target << " = phi(";
-                    bool first = true;
-                    for (const auto& [pred_id, arg] : phi.args) {
-                        if (!first)
-                            std::cout << ", ";
-                        std::cout << arg << " [from block " << pred_id << "]";
-                        first = false;
-                    }
-                    std::cout << ")\n";
-                }
-            }
-
-            // Print renamed instructions
-            const auto& block = bbg.blocks_[bid];
-            for (int i = block.start_idx; i <= block.end_idx; i++) {
-                const auto& instr = bbg.instructions_[i];
-                std::cout << "  ";
-                if (!instr.label.empty())
-                    std::cout << instr.label << ": ";
-                std::cout << instr.opcode;
-                for (const auto& s : instr.source)
-                    std::cout << " " << s;
-                if (!instr.target.empty()) {
-                    std::cout << " =>";
-                    for (const auto& t : instr.target)
-                        std::cout << " " << t;
-                }
-                std::cout << "\n";
+            auto it = da.dominance_tree.find(bid);
+            if (it != da.dominance_tree.end() && !it->second.empty()) {
+                std::cout << "  " << bid << " -> { ";
+                for (int child : it->second)
+                    std::cout << child << " ";
+                std::cout << "}\n";
             }
         }
-    }
 
+        // Compute and print liveness info
+        Liveness_Analyzer la;
+        la.perform_liveness_analysis(cfg, bbg.blocks_, bbg.instructions_);
+
+        std::cout << "\nLiveIn:\n";
+        for (int bid : cfg.block_ids) {
+            std::cout << "  LiveIn(" << bid << ") = { ";
+            for (const auto& var : la.liveness_info[bid].live_in)
+                std::cout << var << " ";
+            std::cout << "}\n";
+        }
+
+        std::cout << "\nLiveOut:\n";
+        for (int bid : cfg.block_ids) {
+            std::cout << "  LiveOut(" << bid << ") = { ";
+            for (const auto& var : la.liveness_info[bid].live_out)
+                std::cout << var << " ";
+            std::cout << "}\n";
+        }
+    }
     return 0;
 }

@@ -2,19 +2,6 @@
 
 #include <queue>
 
-void SSA_Based_Optimizer::build_dominator_tree(const CFG& cfg) {
-    dom_tree_.clear();
-    for (int block_id : cfg.block_ids) {
-        if (!dominance_info_.contains(block_id)) {
-            continue;
-        }
-        int idom = dominance_info_.at(block_id).immediate_dominator;
-        if (idom != -1) {
-            dom_tree_[idom].push_back(block_id);
-        }
-    }
-}
-
 void SSA_Based_Optimizer::eliminate_unreachable_blocks(
     const CFG& cfg, const std::vector<BasicBlock>& blocks, std::vector<Instruction>& instructions) {
     // BFS from entry block to find all reachable blocks
@@ -53,11 +40,6 @@ void SSA_Based_Optimizer::eliminate_unreachable_blocks(
     }
 }
 
-void SSA_Based_Optimizer::perform_dbre(
-    const CFG& cfg, const std::vector<BasicBlock>& blocks, std::vector<Instruction>& instructions) {
-    // TODO: implement
-}
-
 void SSA_Based_Optimizer::eliminate_useless_code(
     const CFG& cfg, const std::vector<BasicBlock>& blocks, std::vector<Instruction>& instructions) {
     // TODO: implement
@@ -70,14 +52,13 @@ void SSA_Based_Optimizer::optimize(
     Dominance_Analyzer dominance_analyzer;
     dominance_analyzer.perform_dominance_analysis(cfg);
     dominance_info_ = dominance_analyzer.dominance_info;
-    build_dominator_tree(cfg);
+    dominance_tree_ = dominance_analyzer.dominance_tree;
 
     // Construct SSA form
-    ssa_constructor_.construct_ssa_form(cfg, blocks, instructions, dominance_info_);
+    ssa_constructor_.construct_ssa_form(
+        cfg, blocks, instructions, dominance_info_, dominance_tree_);
 
     // Optimize
     eliminate_unreachable_blocks(cfg, blocks, instructions);
-    // DBRE is used before dependence-based optimization and other SSA-based optimizations
-    perform_dbre(cfg, blocks, instructions);
     eliminate_useless_code(cfg, blocks, instructions);
 }
