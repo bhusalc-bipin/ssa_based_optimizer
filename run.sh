@@ -38,13 +38,12 @@ sed -i '/^[[:space:]]*$/d' "$ACTUAL_OUTPUT"
 #     exit 1
 # }
 
-# NOTE TO Dr. Carr:
-# You told us to use the diff as shown in the commented part above.
+# Diff is supposed to look as shown in the commented part above.
 # But I am adding the blank line stripping in diff because, the expected output files are inconsistent
-# in terms of handling blank lines. Example: gcd.out (which you provided with this project) has no blank
-# lines, but qs.out (I ran .iloc on qs.il that you provided for first project) has blank lines. But the
-# iloc interpreter that you provided produces output with blank lines. So, to handle this inconsistency,
-# and to pass all test cases I am stripping this blank lines from both the expected output and actual
+# in terms of handling blank lines. Example: gcd.out (which is provided with this project) has no blank
+# lines, but qs.out (I ran .iloc on qs.il provided for first project) has blank lines. But the
+# iloc interpreter produces output with blank lines. So, to handle this inconsistency, and to pass all
+# test cases I am stripping this blank lines from both the expected output and actual
 # output. I hope that's not an issue.
 diff -u --strip-trailing-cr <(sed '/^[[:space:]]*$/d' "$EXPECTED_OUTPUT") "$ACTUAL_OUTPUT" || {
     echo "Output differs from expected output. See diff above."
