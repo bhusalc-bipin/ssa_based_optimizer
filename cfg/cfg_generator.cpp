@@ -15,15 +15,8 @@ void CFG_Generator::build_cfg(
     // Track which block belongs to which procedure (procedure name to list of block ids)
     // Using map from string to VECTOR so that the order of blocks is preserved
     std::unordered_map<std::string, std::vector<int>> procedure_to_blocks;
-    // Track which label starts which block (label name to block id)
-    std::unordered_map<std::string, int> label_to_block_id;
-
     for (const auto& block : blocks) {
         procedure_to_blocks[block.procedure_name].push_back(block.id);
-        const auto& first_instr = instructions[block.start_idx];
-        if (!first_instr.label.empty()) {
-            label_to_block_id[first_instr.label] = block.id;
-        }
     }
 
     // Create CFG for each procedure
@@ -31,6 +24,15 @@ void CFG_Generator::build_cfg(
         CFG cfg;
         cfg.procedure_name = procedure_name;
         cfg.block_ids = block_ids;
+
+        // Track which label starts which block (label name to block id)
+        std::unordered_map<std::string, int> label_to_block_id;
+        for (const auto& block : blocks) {
+            const auto& first_instr = instructions[block.start_idx];
+            if (!first_instr.label.empty()) {
+                label_to_block_id[first_instr.label] = block.id;
+            }
+        }
 
         // Edge from entry block (dummy block represented with id "-1") to the first real block
         // of the procedure
