@@ -1,27 +1,34 @@
 #!/bin/bash
 
-# Run script for SSA based optimizer (created using AI)
+# Run script for SSA based optimizer
 # Usage: ./run.sh <input_file>
-# Example: ./run.sh input/fib.il
+# Example: ./run.sh input/fib.lvn.il
 
 set -e  # Exit on error
 
 if [ "$#" -ne 1 ]; then
     echo "Usage: $0 <input_file>"
-    echo "Example: $0 input/fib.il"
+    echo "Example: $0 input/fib.lvn.il"
     exit 1
 fi
 
 INPUT_FILE="$1"
 
-# Extract filename without path and extension
-BASENAME=$(basename "$INPUT_FILE" .il)
+# Extract filename without path and .lvn.il extension
+FILENAME=$(basename "$INPUT_FILE")
+BASENAME="${FILENAME%.lvn.il}"
+
+# Validate extension
+if [ "$FILENAME" = "$BASENAME" ]; then
+    echo "Error: input file must have .lvn.il extension"
+    exit 1
+fi
 
 # Define paths
-OUTPUT_FILE="output/${BASENAME}.dbre.il"
 OUTPUT_DIR="output"
+OUTPUT_FILE="${OUTPUT_DIR}/${BASENAME}.dbre.il"
 EXPECTED_OUTPUT="input/${BASENAME}.out"
-ACTUAL_OUTPUT="output/${BASENAME}.out"
+ACTUAL_OUTPUT="${OUTPUT_DIR}/${BASENAME}.out"
 
 # Create output directory if it doesn't exist
 mkdir -p "$OUTPUT_DIR"

@@ -47,6 +47,10 @@ std::string SSA_Constructor::generate_expression_key(const Instruction& current_
         return "";
     }
 
+    if (MOVE_OPCODES.contains(current_instruction.opcode)) {
+        return "";
+    }
+
     if (current_instruction.source.empty()) {
         return current_instruction.opcode;
     }
