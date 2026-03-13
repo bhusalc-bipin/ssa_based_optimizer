@@ -101,7 +101,8 @@ void Dominance_Analyzer::compute_dominance_frontiers(const CFG& cfg) {
         if (cfg.predecessors.at(current_block).size() >= 2) {
             for (const auto& predecessor : cfg.predecessors.at(current_block)) {
                 auto runner = predecessor;
-                while (runner != dominance_info[current_block].immediate_dominator) {
+                while (
+                    runner != dominance_info[current_block].immediate_dominator && runner != -1) {
                     dominance_info[runner].dominance_frontier.insert(current_block);
                     runner = dominance_info[runner].immediate_dominator;
                 }

@@ -42,9 +42,11 @@ void BasicBlockGenerator::parse_iloc_file(const std::string& filepath) {
         // remove leading whitespace
         line = line.substr(line.find_first_not_of(" \t"));
 
-        // Parse LABELS
+        // Parse LABELS (only check the first token for a colon, not the whole line, this prevents
+        // false matches on colons inside the quoted strings. Example: .string "A:")
         // Store label in instruction.label and "nop" as opcode
-        if (auto colon_pos = line.find(':'); colon_pos != std::string::npos) {
+        std::string first_token = line.substr(0, line.find_first_of(" \t"));
+        if (auto colon_pos = first_token.find(':'); colon_pos != std::string::npos) {
             instruction.label = line.substr(0, colon_pos);
 
             // Check if there is an instruction after the label on the same line
