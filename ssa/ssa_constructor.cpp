@@ -43,11 +43,9 @@ std::string SSA_Constructor::generate_expression_key(const Instruction& current_
     if (current_instruction.target.empty()
         || OPCODES_USING_TARGET.contains(current_instruction.opcode)
         || OPCODES_WITH_SIDE_EFFECT.contains(current_instruction.opcode)
-        || BRANCH_OPS.contains(current_instruction.opcode) || current_instruction.opcode == "nop") {
-        return "";
-    }
-
-    if (MOVE_OPCODES.contains(current_instruction.opcode)) {
+        || BRANCH_OPS.contains(current_instruction.opcode)
+        || MOVE_OPCODES.contains(current_instruction.opcode)
+        || current_instruction.opcode == "nop") {
         return "";
     }
 
