@@ -78,7 +78,13 @@ int main(int argc, char* argv[]) {
 
     // Extract filename without path and extension
     std::filesystem::path input_path(input_filepath);
-    std::string filename = input_path.stem().string(); // e.g., "fib" from "input/fib.il"
+    // "fib.il" from "input/fib.il" or "fib.lvn.il" from "input/fib.lvn.il"
+    std::string filename = input_path.filename().string();
+    auto dot_position = filename.find(".");
+    if (dot_position != std::string::npos) {
+        // "fib" from "fib.il" or "fib.lvn.il"
+        filename = filename.substr(0, dot_position);
+    }
 
     std::string output_dir = "output";
 
