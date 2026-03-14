@@ -103,20 +103,38 @@ static int find_nearest_marked_postdominator(const std::vector<BasicBlock>& bloc
 
 void SSA_Based_Optimizer::eliminate_unreachable_blocks(
     const CFG& cfg, const std::vector<BasicBlock>& blocks, std::vector<Instruction>& instructions) {
+
+    // Rebuild fresh CFG from non-deleted instructions
+    CFG_Generator fresh_cfg_generator;
+    fresh_cfg_generator.build_cfg(const_cast<std::vector<BasicBlock>&>(blocks), instructions);
+
+    // since cfg builder creates cfg for whole program, we need to first find the fresh cfg for this
+    // procedure because this function is called for each procedure separately
+    const CFG* fresh_cfg = nullptr;
+    for (const auto& c : fresh_cfg_generator.cfgs_) {
+        if (c.procedure_name == cfg.procedure_name) {
+            fresh_cfg = &c;
+            break;
+        }
+    }
+    if (!fresh_cfg) {
+        return;
+    }
+
     // BFS from entry block to find all reachable blocks
     std::unordered_set<int> reachable;
     std::queue<int> worklist;
-    reachable.insert(cfg.block_ids[0]);
-    worklist.push(cfg.block_ids[0]);
+    reachable.insert(fresh_cfg->block_ids[0]);
+    worklist.push(fresh_cfg->block_ids[0]);
 
     while (!worklist.empty()) {
         int current_block = worklist.front();
         worklist.pop();
 
-        if (!cfg.successors.contains(current_block)) {
+        if (!fresh_cfg->successors.contains(current_block)) {
             continue;
         }
-        for (int successor : cfg.successors.at(current_block)) {
+        for (int successor : fresh_cfg->successors.at(current_block)) {
             if (successor == EXIT_BLOCK_ID) {
                 continue;
             }
@@ -128,7 +146,7 @@ void SSA_Based_Optimizer::eliminate_unreachable_blocks(
     }
 
     // Mark instructions in unreachable blocks as deleted
-    for (int block_id : cfg.block_ids) {
+    for (int block_id : fresh_cfg->block_ids) {
         if (reachable.contains(block_id)) {
             continue;
         }
@@ -347,6 +365,6 @@ void SSA_Based_Optimizer::optimize(
         cfg, blocks, instructions, dominance_info_, dominance_tree_);
 
     // Optimize
-    eliminate_unreachable_blocks(cfg, blocks, instructions);
     eliminate_useless_code(cfg, blocks, instructions);
+    eliminate_unreachable_blocks(cfg, blocks, instructions);
 }

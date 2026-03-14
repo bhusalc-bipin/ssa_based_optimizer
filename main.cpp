@@ -103,13 +103,13 @@ int main(int argc, char* argv[]) {
     bbg.build_basic_blocks();
 
     // Step 3: Build CFG for each procedure
-    CFG_Generator config_generator;
-    config_generator.build_cfg(bbg.blocks_, bbg.instructions_);
+    CFG_Generator cfg_generator;
+    cfg_generator.build_cfg(bbg.blocks_, bbg.instructions_);
 
     // Step 4: Run SSA-based optimization for each procedure
     SSA_Based_Optimizer ssa_based_optimizer;
     SSA_Deconstructor ssa_deconstructor;
-    for (const auto& cfg : config_generator.cfgs_) {
+    for (const auto& cfg : cfg_generator.cfgs_) {
         ssa_based_optimizer.optimize(cfg, bbg.blocks_, bbg.instructions_);
         ssa_deconstructor.deconstruct_ssa(bbg.instructions_);
     }
