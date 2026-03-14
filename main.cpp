@@ -115,8 +115,8 @@ int main(int argc, char* argv[]) {
     }
 
     // Step 4: Run iloc-based optimization for each procedure
-    ILOC_Based_Optimizer iloc_based_optimizer;
-    iloc_based_optimizer.optimize(bbg.blocks_, bbg.instructions_);
+    // ILOC_Based_Optimizer iloc_based_optimizer;
+    // iloc_based_optimizer.optimize(bbg.blocks_, bbg.instructions_);
 
     // Step 5: Write the optimized iloc code
     write_iloc_file(bbg.instructions_, output_filepath);
