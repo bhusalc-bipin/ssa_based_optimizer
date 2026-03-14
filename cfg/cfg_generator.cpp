@@ -26,11 +26,13 @@ void CFG_Generator::build_cfg(
         cfg.block_ids = block_ids;
 
         // Track which label starts which block (label name to block id)
+        // Only index current procedure's blocks to avoid issues with duplicate labels between
+        // different procedures
         std::unordered_map<std::string, int> label_to_block_id;
-        for (const auto& block : blocks) {
-            const auto& first_instr = instructions[block.start_idx];
-            if (!first_instr.label.empty()) {
-                label_to_block_id[first_instr.label] = block.id;
+        for (int bid : block_ids) {
+            const auto& first_instruction = instructions[blocks[bid].start_idx];
+            if (!first_instruction.label.empty()) {
+                label_to_block_id[first_instruction.label] = bid;
             }
         }
 
@@ -41,7 +43,16 @@ void CFG_Generator::build_cfg(
         // Add edges for each real block
         for (size_t i = 0; i < block_ids.size(); i++) {
             int current_block = block_ids[i];
-            const auto& last_instruction = instructions[blocks[current_block].end_idx];
+
+            // Find last non-deleted instruction in this block
+            int last_idx = blocks[current_block].end_idx;
+            while (last_idx >= blocks[current_block].start_idx && instructions[last_idx].deleted) {
+                last_idx--;
+            }
+            if (last_idx < blocks[current_block].start_idx) {
+                continue; // entire block is deleted, skip
+            }
+            const auto& last_instruction = instructions[last_idx];
             const std::string& opcode = last_instruction.opcode;
 
             // edge to exit block (dummy block represented with id "-2")
